@@ -1,7 +1,7 @@
 import re
 
 
-PATTERN_WHITESPACE = re.compile(r'\s+')
+WHITESPACE_PATTERN = re.compile(r'\s+', re.MULTILINE)
 
 
 def parse_words(x):
@@ -9,4 +9,8 @@ def parse_words(x):
 
 
 def strip_whitespace(string):
-    return PATTERN_WHITESPACE.sub('', string)
+    return WHITESPACE_PATTERN.sub('', string)
+
+
+def compact_whitespace(string):
+    return WHITESPACE_PATTERN.sub(' ', string).strip()
