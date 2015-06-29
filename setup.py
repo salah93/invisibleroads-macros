@@ -3,11 +3,11 @@ from setuptools import setup
 
 
 FOLDER = dirname(abspath(__file__))
-DESCRIPTION = '\n'.join(open(join(FOLDER, x)).read().strip() for x in [
+DESCRIPTION = '\n\n'.join(open(join(FOLDER, x)).read().strip() for x in [
     'README.rst', 'CHANGES.rst'])
 setup(
     name='invisibleroads-macros',
-    version='0.1',
+    version='0.1.1',
     description='Shortcut functions',
     long_description=DESCRIPTION,
     classifiers=[

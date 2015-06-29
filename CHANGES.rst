@@ -1,3 +1,4 @@
 0.1
 ---
-- Add disk.make_folder, disk.compress, disk.uncompress
+- Add disk.compress, disk.uncompress
+- Add text.compact_whitespace

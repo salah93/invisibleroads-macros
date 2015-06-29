@@ -2,6 +2,7 @@
 *.egg
 *.egg-info
 *.py[co]
+dist
 # Vim
-*~
 *.sw[op]
+*~
