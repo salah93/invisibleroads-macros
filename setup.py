@@ -1,5 +1,5 @@
 from os.path import abspath, dirname, join
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 FOLDER = dirname(abspath(__file__))
@@ -17,6 +17,6 @@ setup(
     author_email='rhh@crosscompute.com',
     url='http://invisibleroads.com',
     keywords='invisibleroads',
-    packages=['invisibleroads_macros'],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False)
