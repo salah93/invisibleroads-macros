@@ -1,3 +1,8 @@
+import re
+from os import getcwd
+from os.path import expanduser, relpath
+
+
 def format_nested_dictionary(d, prefix=''):
     lines = []
     for key in sorted(d):
@@ -12,3 +17,12 @@ def format_nested_dictionary(d, prefix=''):
         else:
             lines.append(left_hand_side + ' = ' + str(value))
     return '\n'.join(lines)
+
+
+def format_relative_path(path):
+    relative_path = relpath(path, getcwd())
+    return format_path(relative_path)
+
+
+def format_path(path):
+    return re.sub(r'^' + expanduser('~'), '~', path)
