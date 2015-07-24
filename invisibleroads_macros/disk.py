@@ -5,8 +5,7 @@ import subprocess
 from contextlib import contextmanager
 from glob import glob
 from os import chdir, getcwd, makedirs, walk
-from os.path import abspath, dirname, islink, join, normpath, realpath, relpath
-from zipfile import ZipFile, ZIP_DEFLATED
+from os.path import abspath, dirname, join, normpath, relpath
 
 
 def replace_folder(target_folder, source_folder):
@@ -72,6 +71,12 @@ def compress(source_folder, target_path=None):
             raise IOError('cannot compress empty folder "%s"' % source_folder)
         subprocess.check_output(command_terms + [target_path] + source_paths)
     return target_path
+
+
+def compress_zip(source_folder, target_path=None):
+    if not target_path:
+        target_path = source_folder + '.zip'
+    return compress(source_folder, target_path)
 
 
 def uncompress(source_path, target_folder=None):
