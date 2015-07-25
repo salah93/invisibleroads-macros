@@ -1,7 +1,7 @@
 0.3
 ---
 - Add queue.Pusher, queue.Puller, queue.Publisher, queue.Subscriber
-- Add repository.get_github_ssh_url
+- Add repository.get_github_repository, repository.get_github_ssh_url
 
 0.2
 ---

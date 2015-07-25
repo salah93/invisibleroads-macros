@@ -39,7 +39,7 @@ class Puller(object):
             if raise_keyboard_interrupt:
                 raise
 
-    def yield_pack(self, raise_keyboard_interrupt=True):
+    def yield_pack(self, raise_keyboard_interrupt=False):
         for packet in self.yield_packet(raise_keyboard_interrupt):
             yield msgpack.unpackb(packet, use_list=False)
 
@@ -54,11 +54,11 @@ class Publisher(object):
         self.socket.send('')
         sleep(0.1)
 
-    def publish_packet(self, channel, packet):
+    def publish_channel_packet(self, channel, packet):
         self.socket.send('%s %s' % (channel, packet))
 
-    def publish_pack(self, channel, pack):
-        self.publish_packet(channel, msgpack.packb(pack))
+    def publish_channel_pack(self, channel, pack):
+        self.publish_channel_packet(channel, msgpack.packb(pack))
 
 
 class Subscriber(object):
