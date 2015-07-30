@@ -4,8 +4,10 @@ import shutil
 import subprocess
 from contextlib import contextmanager
 from glob import glob
-from os import chdir, getcwd, makedirs, walk
-from os.path import abspath, dirname, join, normpath, relpath
+from os import chdir, getcwd, makedirs, readlink, symlink, walk
+from os.path import abspath, dirname, exists, isfile, join, normpath, relpath
+
+from .exceptions import BadArchive, InvisibleRoadsError
 
 
 def replace_folder(target_folder, source_folder):
@@ -34,6 +36,20 @@ def make_folder(folder):
     except OSError:
         pass
     return folder
+
+
+def make_link(source_path, target_path):
+    source_path = normpath(source_path)
+    if not exists(target_path):
+        symlink(source_path, target_path)
+        return target_path
+    try:
+        if normpath(readlink(target_path)) != source_path:
+            raise IOError('could not make link; target_path is another link')
+    except OSError:
+        path_type = 'file' if isfile(target_path) else 'folder'
+        raise IOError('could not make link; target_path is a %s' % path_type)
+    return target_path
 
 
 def find_path(name, folder):
@@ -90,7 +106,15 @@ def uncompress(source_path, target_folder=None):
         target_folder = re.sub(
             target_extension.replace('.', '\.') + '$', '', source_path)
     make_folder(target_folder)
-    subprocess.check_output(command_terms + [target_folder])
+    try:
+        subprocess.check_output(
+            command_terms + [target_folder], stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        o = e.output
+        if 'does not look like a tar archive' in o:
+            m = 'could not unpack archive (source_path = %s)'
+            raise BadArchive(m % source_path)
+        raise InvisibleRoadsError(o)
     return target_folder
 
 

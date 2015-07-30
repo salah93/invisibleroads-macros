@@ -13,20 +13,20 @@ def get_github_repository(target_folder, github_url):
                 'git', 'clone', get_github_ssh_url(github_url), target_folder,
             ], stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
-            o = e.output.lower()
+            o = e.output
             if 'not found' in o:
                 m = 'Could not access repository (github_url = %s)'
                 raise BadURL(m % github_url)
-            raise InvisibleRoadsError(e.output)
+            raise InvisibleRoadsError(o)
     with cd(target_folder):
         try:
             subprocess.check_output(['git', 'fetch'], stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
-            o = e.output.lower()
-            if 'not a git repository' in o:
+            o = e.output
+            if 'Not a git repository' in o:
                 m = 'Could not update repository (target_folder = %s)'
                 raise BadRepository(m % target_folder)
-            raise InvisibleRoadsError(e.output)
+            raise InvisibleRoadsError(o)
 
 
 def get_github_ssh_url(github_url):

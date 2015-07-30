@@ -2,9 +2,13 @@ class InvisibleRoadsError(Exception):
     pass
 
 
-class BadURL(InvisibleRoadsError):
+class BadArchive(InvisibleRoadsError):
     pass
 
 
 class BadRepository(InvisibleRoadsError):
+    pass
+
+
+class BadURL(InvisibleRoadsError):
     pass
