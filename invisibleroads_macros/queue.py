@@ -63,14 +63,15 @@ class Publisher(object):
 
 class Subscriber(object):
 
-    def __init__(self, socket_url, bind_socket=False, channel=''):
+    def __init__(self, socket_url, bind_socket=False, channels=None):
         self.socket_url = socket_url
         self.socket = SOCKET_CONTEXT.socket(zmq.SUB)
-        self.socket.subscribe = str(channel)
+        for channel in channels or []:
+            self.socket.subscribe = str(channel)
         connect = self.socket.bind if bind_socket else self.socket.connect
         connect(socket_url)
-        if channel:
-            logging.info('Listening on %s channel=%s', socket_url, channel)
+        if channels:
+            logging.info('Listening on %s channels=%s', socket_url, channels)
         else:
             logging.info('Listening on %s', socket_url)
 
