@@ -5,9 +5,16 @@ import subprocess
 from contextlib import contextmanager
 from glob import glob
 from os import chdir, getcwd, makedirs, readlink, symlink, walk
-from os.path import abspath, dirname, exists, isfile, join, normpath, relpath
+from os.path import (
+    exists, isfile, join, splitext,
+    abspath, basename, dirname, normpath, relpath)
 
 from .exceptions import BadArchive, InvisibleRoadsError
+
+
+def clean_folder(folder):
+    remove_folder(folder)
+    return make_folder(folder)
 
 
 def replace_folder(target_folder, source_folder):
@@ -17,9 +24,12 @@ def replace_folder(target_folder, source_folder):
     return target_folder
 
 
-def clean_folder(folder):
-    remove_folder(folder)
-    return make_folder(folder)
+def make_folder(folder):
+    try:
+        makedirs(folder)
+    except OSError:
+        pass
+    return folder
 
 
 def remove_folder(folder):
@@ -30,12 +40,8 @@ def remove_folder(folder):
     return folder
 
 
-def make_folder(folder):
-    try:
-        makedirs(folder)
-    except OSError:
-        pass
-    return folder
+def get_nickname(path):
+    return splitext(basename(path))[0]
 
 
 def make_link(source_path, target_path):
