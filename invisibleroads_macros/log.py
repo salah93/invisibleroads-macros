@@ -10,7 +10,7 @@ def format_nested_dictionary(d, format_by_suffix=None, prefix=''):
         if isinstance(value, dict):
             parts.append(format_nested_dictionary(value, left_hand_side + '.'))
             continue
-        for suffix, format_value in format_by_suffix.iteritems():
+        for suffix, format_value in (format_by_suffix or {}).iteritems():
             if key.endswith(suffix):
                 parts.append(left_hand_side + ' = ' + format_value(value))
                 break
