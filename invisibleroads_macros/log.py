@@ -8,7 +8,8 @@ def format_nested_dictionary(d, format_by_suffix=None, prefix=''):
         left_hand_side = prefix + str(key)
         value = d[key]
         if isinstance(value, dict):
-            parts.append(format_nested_dictionary(value, left_hand_side + '.'))
+            parts.append(format_nested_dictionary(
+                value, format_by_suffix, left_hand_side + '.'))
             continue
         for suffix, format_value in (format_by_suffix or {}).iteritems():
             if key.endswith(suffix):
@@ -38,3 +39,43 @@ def format_hanging_indent(x):
 
 def format_indented_block(x):
     return '\n' + '\n'.join('  ' + line for line in x.strip().splitlines())
+
+
+def parse_nested_dictionary(s, parse_by_suffix=None):
+    raw_dictionary, key = {}, None
+    for line in s.splitlines():
+        if line.startswith('  '):
+            if key is not None:
+                value = line[2:].rstrip()
+                raw_dictionary[key].append(value)
+            continue
+        try:
+            key, value = line.split('=', 1)
+        except ValueError:
+            key = None
+        else:
+            key = key.strip()
+            value = value.strip()
+            raw_dictionary[key] = [value]
+    d = {}
+    for k, v in raw_dictionary.iteritems():
+        v = '\n'.join(v).strip()
+        for suffix, parse_value in (parse_by_suffix or {}).iteritems():
+            if k.endswith(suffix):
+                v = parse_value(v)
+        _set_nested_value(d, k, v)
+    return d
+
+
+def _set_nested_value(target_dictionary, key_string, value):
+    this_dictionary = target_dictionary
+    for key in key_string.split('.'):
+        key = key.strip()
+        last_dictionary = this_dictionary
+        try:
+            this_dictionary = this_dictionary[key]
+        except KeyError:
+            this_dictionary[key] = {}
+            this_dictionary = this_dictionary[key]
+    last_dictionary[key] = value
+    return target_dictionary

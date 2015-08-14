@@ -1,3 +1,7 @@
+0.4
+---
+- Add log.parse_nested_dictionary
+
 0.3
 ---
 - Add queue.Pusher, queue.Puller, queue.Publisher, queue.Subscriber
