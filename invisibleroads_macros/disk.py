@@ -7,7 +7,7 @@ from glob import glob
 from os import chdir, getcwd, makedirs, readlink, symlink, walk
 from os.path import (
     exists, isfile, join, splitext,
-    abspath, basename, dirname, normpath, relpath)
+    abspath, basename, dirname, normpath, realpath, relpath)
 
 from .exceptions import BadArchive, InvisibleRoadsError
 
@@ -132,3 +132,7 @@ def cd(target_folder):
         yield
     finally:
         chdir(source_folder)
+
+
+def are_same_path(path1, path2):
+    return realpath(path1) == realpath(path2)

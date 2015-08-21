@@ -1,10 +1,9 @@
 import re
-import subprocess
 from os import getcwd
 from os.path import exists
 
 from .disk import cd
-from .exceptions import BadURL, BadRepository, InvisibleRoadsError
+from .exceptions import BadURL, BadRepository
 from .shell import run_command
 
 
@@ -22,11 +21,6 @@ def download_github_repository(target_folder, github_url):
 
 def get_repository_commit_hash(folder=None):
     return run_git('git rev-parse HEAD', folder)
-
-
-def get_repository_name(folder=None):
-    github_url = run_git('git config --get remote.origin.url', folder)
-    return parse_github_url(github_url)[1]
 
 
 def get_repository_folder(folder=None):
