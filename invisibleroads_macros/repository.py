@@ -1,32 +1,36 @@
 import re
 import subprocess
+from os import getcwd
 from os.path import exists
 
 from .disk import cd
 from .exceptions import BadURL, BadRepository, InvisibleRoadsError
+from .shell import run_command
 
 
-def get_github_repository(target_folder, github_url):
+def download_github_repository(target_folder, github_url):
     if not exists(target_folder):
-        try:
-            subprocess.check_output([
-                'git', 'clone', get_github_ssh_url(github_url), target_folder,
-            ], stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            o = e.output
-            if 'not found' in o:
-                m = 'Could not access repository (github_url = %s)'
-                raise BadURL(m % github_url)
-            raise InvisibleRoadsError(o)
-    with cd(target_folder):
-        try:
-            subprocess.check_output(['git', 'fetch'], stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            o = e.output
-            if 'Not a git repository' in o:
-                m = 'Could not update repository (target_folder = %s)'
-                raise BadRepository(m % target_folder)
-            raise InvisibleRoadsError(o)
+        m = 'Could not access repository (github_url = %s)'
+        run_command([
+            'git', 'clone', get_github_ssh_url(github_url), target_folder,
+        ], exception_by_error={
+            'not found': BadURL(m % github_url)
+        })
+    run_git('git fetch', target_folder)
+    return get_repository_commit_hash(target_folder)
+
+
+def get_repository_commit_hash(folder=None):
+    return run_git('git rev-parse HEAD', folder)
+
+
+def get_repository_name(folder=None):
+    github_url = run_git('git config --get remote.origin.url', folder)
+    return parse_github_url(github_url)[1]
+
+
+def get_repository_folder(folder=None):
+    return run_git('git rev-parse --show-toplevel', folder)
 
 
 def get_github_ssh_url(github_url):
@@ -46,3 +50,15 @@ def parse_github_url(github_url):
     except AttributeError:
         m = 'Could not parse as GitHub URL (github_url = %s)'
         raise BadURL(m % github_url)
+
+
+def run_git(command_args, folder=None, exception_by_error=None):
+    if not folder:
+        folder = getcwd()
+    exception_by_error = dict({
+        'Not a git repository': BadRepository(
+            'Not a git repository (folder = %s)' % folder),
+    }, **(exception_by_error or {}))
+    with cd(folder):
+        output = run_command(command_args, exception_by_error)
+    return output
