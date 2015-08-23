@@ -8,6 +8,8 @@ from os import chdir, getcwd, makedirs, readlink, symlink, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
+from shutil import rmtree
+from tempfile import mkdtemp
 
 from .exceptions import BadArchive, InvisibleRoadsError
 
@@ -124,6 +126,10 @@ def uncompress(source_path, target_folder=None):
     return target_folder
 
 
+def are_same_path(path1, path2):
+    return realpath(path1) == realpath(path2)
+
+
 @contextmanager
 def cd(target_folder):
     source_folder = getcwd()
@@ -134,5 +140,8 @@ def cd(target_folder):
         chdir(source_folder)
 
 
-def are_same_path(path1, path2):
-    return realpath(path1) == realpath(path2)
+@contextmanager
+def make_temporary_folder(suffix='', prefix='tmp', target_folder=None):
+    temporary_folder = mkdtemp(suffix, prefix, target_folder)
+    yield temporary_folder
+    rmtree(temporary_folder)
