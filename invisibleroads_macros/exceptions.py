@@ -10,5 +10,9 @@ class BadRepository(InvisibleRoadsError):
     pass
 
 
+class BadRepositoryURL(InvisibleRoadsError):
+    pass
+
+
 class BadURL(InvisibleRoadsError):
     pass

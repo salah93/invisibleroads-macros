@@ -3,7 +3,7 @@ from os import getcwd
 from os.path import exists
 
 from .disk import cd
-from .exceptions import BadURL, BadRepository
+from .exceptions import BadURL, BadRepositoryURL, BadRepository
 from .shell import run_command
 
 
@@ -43,7 +43,7 @@ def parse_github_url(github_url):
             r'([^/:]+)/([^/.]+)(\.git)?$', github_url).groups()[:2]
     except AttributeError:
         m = 'Could not parse as GitHub URL (github_url = %s)'
-        raise BadURL(m % github_url)
+        raise BadRepositoryURL(m % github_url)
 
 
 def run_git(command_args, folder=None, exception_by_error=None):
