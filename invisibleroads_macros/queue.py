@@ -52,7 +52,7 @@ class Publisher(object):
         connect = self.socket.bind if bind_socket else self.socket.connect
         connect(socket_url)
         self.socket.send('')
-        sleep(0.1)
+        sleep(1)
 
     def publish_channel_packet(self, channel, packet):
         self.socket.send('%s %s' % (channel, packet))
@@ -66,7 +66,7 @@ class Subscriber(object):
     def __init__(self, socket_url, bind_socket=False, channels=None):
         self.socket_url = socket_url
         self.socket = SOCKET_CONTEXT.socket(zmq.SUB)
-        for channel in channels or []:
+        for channel in channels or ['']:
             self.socket.subscribe = str(channel)
         connect = self.socket.bind if bind_socket else self.socket.connect
         connect(socket_url)
