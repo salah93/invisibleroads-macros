@@ -9,18 +9,25 @@ from .shell import run_command
 
 
 def download_github_repository(target_folder, github_url):
+    warnings = []
+    host_name = urlparse(get_github_https_url(github_url)).netloc
+    exception_by_error = {
+        'Could not read': BadHost(
+            'Could not access host (host_name = %s)' % host_name),
+        'not found': BadURL(
+            'Could not access repository (github_url = %s)' % github_url),
+    }
     if not exists(target_folder):
-        host_name = urlparse(get_github_https_url(github_url)).netloc
         run_command([
             'git', 'clone', get_github_ssh_url(github_url), target_folder,
-        ], exception_by_error={
-            'not found': BadURL(
-                'Could not access repository (github_url = %s)' % github_url),
-            'Could not read': BadHost(
-                'Could not access host (host_name = %s)' % host_name)
-        })
-    run_git('git fetch', target_folder)
-    return get_repository_commit_hash(target_folder)
+        ], exception_by_error)
+    try:
+        run_git('git fetch', target_folder, exception_by_error)
+    except BadHost as e:
+        warnings.append(e)
+    except BadURL as e:
+        warnings.append(e)
+    return get_repository_commit_hash(target_folder), warnings
 
 
 def get_repository_commit_hash(folder=None):
