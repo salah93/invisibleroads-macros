@@ -1,33 +1,25 @@
 import re
 from os import getcwd
 from os.path import exists
-from urlparse import urlparse
 
 from .disk import cd
-from .exceptions import BadHost, BadURL, BadRepositoryURL, BadRepository
+from .exceptions import BadURL, BadRepositoryURL, BadRepository
 from .shell import run_command
 
 
 def download_github_repository(target_folder, github_url):
-    warnings = []
-    host_name = urlparse(get_github_https_url(github_url)).netloc
+    exception = BadURL(
+        'Could not access repository (github_url = %s)' % github_url)
     exception_by_error = {
-        'Could not read': BadHost(
-            'Could not access host (host_name = %s)' % host_name),
-        'not found': BadURL(
-            'Could not access repository (github_url = %s)' % github_url),
+        'Could not read': exception,
+        'not found': exception,
     }
     if not exists(target_folder):
         run_command([
             'git', 'clone', get_github_ssh_url(github_url), target_folder,
         ], exception_by_error)
-    try:
-        run_git('git fetch', target_folder, exception_by_error)
-    except BadHost as e:
-        warnings.append(e)
-    except BadURL as e:
-        warnings.append(e)
-    return get_repository_commit_hash(target_folder), warnings
+    run_git('git fetch', target_folder, exception_by_error)
+    return get_repository_commit_hash(target_folder)
 
 
 def get_repository_commit_hash(folder=None):
