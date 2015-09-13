@@ -1,6 +1,5 @@
 import re
 from os import getcwd
-from os.path import exists
 
 from .disk import cd
 from .exceptions import BadURL, BadRepositoryURL, BadRepository
@@ -8,17 +7,13 @@ from .shell import run_command
 
 
 def download_github_repository(target_folder, github_url):
-    exception = BadURL(
-        'Could not access repository (github_url = %s)' % github_url)
-    exception_by_error = {
-        'Could not read': exception,
-        'not found': exception,
-    }
-    if not exists(target_folder):
-        run_command([
-            'git', 'clone', get_github_ssh_url(github_url), target_folder,
-        ], exception_by_error)
-    run_git('git fetch', target_folder, exception_by_error)
+    github_url = get_github_ssh_url(github_url)
+    run_command(['git', 'clone', github_url, target_folder])
+    return get_repository_commit_hash(target_folder)
+
+
+def update_github_repository(target_folder):
+    run_git('git fetch', target_folder)
     return get_repository_commit_hash(target_folder)
 
 
@@ -53,8 +48,9 @@ def run_git(command_args, folder=None, exception_by_error=None):
     if not folder:
         folder = getcwd()
     exception_by_error = dict({
-        'Not a git repository': BadRepository(
-            'Not a git repository (folder = %s)' % folder),
+        'Could not read': BadURL,
+        'Not a git repository': BadRepository,
+        'not found': BadURL,
     }, **(exception_by_error or {}))
     with cd(folder):
         output = run_command(command_args, exception_by_error)
