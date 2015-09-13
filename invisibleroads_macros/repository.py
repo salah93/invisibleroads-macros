@@ -2,7 +2,7 @@ import re
 from os import getcwd
 
 from .disk import cd
-from .exceptions import BadURL, BadRepositoryURL, BadRepository
+from .exceptions import BadCommitHash, BadRepository, BadRepositoryURL, BadURL
 from .shell import run_command
 
 
@@ -51,6 +51,8 @@ def run_git(command_args, folder=None, exception_by_error=None):
         'Could not read': BadURL,
         'Not a git repository': BadRepository,
         'not found': BadURL,
+        'not a tree object': BadCommitHash,
+        'Not a valid object name': BadCommitHash,
     }, **(exception_by_error or {}))
     with cd(folder):
         output = run_command(command_args, exception_by_error)
