@@ -8,7 +8,7 @@ from .shell import run_command
 
 def download_github_repository(target_folder, github_url):
     github_url = get_github_ssh_url(github_url)
-    run_command(['git', 'clone', github_url, target_folder])
+    run_git(['git', 'clone', github_url, target_folder])
     return get_repository_commit_hash(target_folder)
 
 
