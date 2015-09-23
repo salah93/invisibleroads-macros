@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from contextlib import contextmanager
 from glob import glob
-from os import chdir, getcwd, makedirs, readlink, symlink, walk
+from os import chdir, getcwd, mkdir, makedirs, readlink, symlink, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
@@ -12,6 +12,14 @@ from shutil import rmtree
 from tempfile import mkdtemp
 
 from .exceptions import BadArchive, InvisibleRoadsError
+
+
+def make_folder(folder):
+    try:
+        makedirs(folder)
+    except OSError:
+        pass
+    return folder
 
 
 def clean_folder(folder):
@@ -24,14 +32,6 @@ def replace_folder(target_folder, source_folder):
     make_folder(dirname(target_folder))
     shutil.copytree(source_folder, target_folder)
     return target_folder
-
-
-def make_folder(folder):
-    try:
-        makedirs(folder)
-    except OSError:
-        pass
-    return folder
 
 
 def remove_folder(folder):
@@ -145,3 +145,27 @@ def make_temporary_folder(suffix='', prefix='tmp', target_folder=None):
     temporary_folder = mkdtemp(suffix, prefix, target_folder)
     yield temporary_folder
     rmtree(temporary_folder)
+
+
+def make_enumerated_folder_from_script_path(script_path):
+    package_name = get_nickname(script_path)
+    if 'run' == package_name:
+        package_folder = dirname(abspath(script_path))
+        package_name = get_nickname(package_folder)
+    return make_enumerated_folder(join('/tmp', package_name))
+
+
+def make_enumerated_folder(base_folder):
+    make_folder(base_folder)
+    suggest_folder = lambda x: join(base_folder, str(x))
+    target_index = 0
+    target_folder = suggest_folder(target_index)
+    while True:
+        try:
+            mkdir(target_folder)
+            break
+        except OSError:
+            pass
+        target_index += 1
+        target_folder = suggest_folder(target_index)
+    return target_folder

@@ -1,5 +1,6 @@
 0.4
 ---
+- Add disk.make_enumerated_folder
 - Add log.parse_nested_dictionary
 
 0.3
