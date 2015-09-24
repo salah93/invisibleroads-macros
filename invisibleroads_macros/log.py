@@ -1,5 +1,16 @@
 import re
+from collections import OrderedDict
 from os.path import expanduser
+
+
+def sort_dictionary(value_by_key, sorted_keys):
+    d = OrderedDict()
+    for key in sorted_keys:
+        try:
+            d[key] = value_by_key[key]
+        except KeyError:
+            pass
+    return d
 
 
 def format_nested_dictionary(d, format_by_suffix=None, prefix=''):
