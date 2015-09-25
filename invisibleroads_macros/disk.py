@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from contextlib import contextmanager
 from glob import glob
-from os import chdir, getcwd, mkdir, makedirs, readlink, symlink, walk
+from os import chdir, getcwd, makedirs, readlink, symlink, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
@@ -156,16 +156,14 @@ def make_enumerated_folder_from_script_path(script_path):
 
 
 def make_enumerated_folder(base_folder):
-    make_folder(base_folder)
     suggest_folder = lambda x: join(base_folder, str(x))
     target_index = 0
     target_folder = suggest_folder(target_index)
     while True:
         try:
-            mkdir(target_folder)
+            makedirs(target_folder)
             break
         except OSError:
-            pass
-        target_index += 1
-        target_folder = suggest_folder(target_index)
+            target_index += 1
+            target_folder = suggest_folder(target_index)
     return target_folder

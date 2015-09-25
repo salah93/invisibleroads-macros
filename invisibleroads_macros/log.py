@@ -13,16 +13,16 @@ def sort_dictionary(value_by_key, sorted_keys):
     return d
 
 
-def format_nested_dictionary(d, format_by_suffix=None, prefix=''):
+def format_nested_dictionary(d, suffix_format_packs=None, prefix=''):
     parts = []
-    for key in sorted(d):
+    for key in d:
         left_hand_side = prefix + str(key)
         value = d[key]
         if isinstance(value, dict):
             parts.append(format_nested_dictionary(
-                value, format_by_suffix, left_hand_side + '.'))
+                value, suffix_format_packs, left_hand_side + '.'))
             continue
-        for suffix, format_value in (format_by_suffix or {}).iteritems():
+        for suffix, format_value in suffix_format_packs or []:
             if key.endswith(suffix):
                 parts.append(left_hand_side + ' = ' + format_value(value))
                 break
@@ -52,8 +52,8 @@ def format_indented_block(x):
     return '\n' + '\n'.join('  ' + line for line in x.strip().splitlines())
 
 
-def parse_nested_dictionary(s, parse_by_suffix=None):
-    raw_dictionary, key = {}, None
+def parse_nested_dictionary(s, suffix_parse_packs=None):
+    raw_dictionary, key = OrderedDict(), None
     for line in s.splitlines():
         if line.startswith('  '):
             if key is not None:
@@ -68,10 +68,10 @@ def parse_nested_dictionary(s, parse_by_suffix=None):
             key = key.strip()
             value = value.strip()
             raw_dictionary[key] = [value]
-    d = {}
+    d = OrderedDict()
     for k, v in raw_dictionary.iteritems():
         v = '\n'.join(v).strip()
-        for suffix, parse_value in (parse_by_suffix or {}).iteritems():
+        for suffix, parse_value in suffix_parse_packs or []:
             if k.endswith(suffix):
                 v = parse_value(v)
         _set_nested_value(d, k, v)
