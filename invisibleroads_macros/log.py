@@ -13,11 +13,11 @@ def sort_dictionary(value_by_key, sorted_keys):
     return d
 
 
-def format_nested_dictionary(d, suffix_format_packs=None, prefix=''):
+def format_nested_dictionary(
+        value_by_key, suffix_format_packs=None, prefix=''):
     parts = []
-    for key in d:
+    for key, value in value_by_key.iteritems():
         left_hand_side = prefix + str(key)
-        value = d[key]
         if isinstance(value, dict):
             parts.append(format_nested_dictionary(
                 value, suffix_format_packs, left_hand_side + '.'))
@@ -52,9 +52,9 @@ def format_indented_block(x):
     return '\n' + '\n'.join('  ' + line for line in x.strip().splitlines())
 
 
-def parse_nested_dictionary(s, suffix_parse_packs=None):
+def parse_nested_dictionary(text, suffix_parse_packs=None):
     raw_dictionary, key = OrderedDict(), None
-    for line in s.splitlines():
+    for line in text.splitlines():
         if line.startswith('  '):
             if key is not None:
                 value = line[2:].rstrip()
