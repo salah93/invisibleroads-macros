@@ -13,6 +13,17 @@ def sort_dictionary(value_by_key, sorted_keys):
     return d
 
 
+def stylize_dictionary(value_by_key, suffix_format_packs):
+    d = {}
+    for key, value in value_by_key.iteritems():
+        for suffix, format_value in suffix_format_packs:
+            if key.endswith(suffix):
+                value = format_value(value)
+                break
+        d[key] = value
+    return d
+
+
 def format_nested_dictionary(
         value_by_key, suffix_format_packs=None, prefix='', censored=False):
     parts = []

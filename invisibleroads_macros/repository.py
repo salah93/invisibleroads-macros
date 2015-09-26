@@ -17,6 +17,11 @@ def update_github_repository(target_folder):
     return get_repository_commit_hash(target_folder)
 
 
+def get_repository_url(folder=None):
+    github_url = run_git('git config --get remote.origin.url', folder)
+    return get_github_https_url(github_url)
+
+
 def get_repository_commit_hash(folder=None):
     return run_git('git rev-parse HEAD', folder)
 
