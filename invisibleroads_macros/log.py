@@ -14,8 +14,11 @@ def sort_dictionary(value_by_key, sorted_keys):
 
 
 def format_nested_dictionary(
-        value_by_key, suffix_format_packs=None, prefix=''):
+        value_by_key, suffix_format_packs=None, prefix='', censored=False):
     parts = []
+    if censored:
+        value_by_key = OrderedDict(
+            x for x in value_by_key.iteritems() if not x[0].startswith('_'))
     for key, value in value_by_key.iteritems():
         left_hand_side = prefix + str(key)
         if isinstance(value, dict):
