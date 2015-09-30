@@ -147,7 +147,7 @@ def make_temporary_folder(suffix='', prefix='tmp', target_folder=None):
     rmtree(temporary_folder)
 
 
-def make_enumerated_folder_from_script_path(script_path):
+def make_enumerated_folder_for(script_path):
     package_name = get_nickname(script_path)
     if 'run' == package_name:
         package_folder = dirname(abspath(script_path))
