@@ -66,6 +66,30 @@ def format_indented_block(x):
     return '\n' + '\n'.join('  ' + line for line in x.strip().splitlines())
 
 
+def get_nested_dictionary(nested_lists):
+    d = OrderedDict()
+    for k, v in nested_lists:
+        if k.endswith('_'):
+            try:
+                v = get_nested_dictionary(v)
+            except TypeError:
+                pass
+            else:
+                k = k[:-1]
+        d[k] = v
+    return d
+
+
+def get_nested_lists(nested_dictionary):
+    xs = []
+    for k, v in nested_dictionary.iteritems():
+        if hasattr(v, 'iteritems'):
+            v = get_nested_lists(v)
+            k = k + '_'
+        xs.append((k, v))
+    return xs
+
+
 def parse_nested_dictionary(text, suffix_parse_packs=None):
     raw_dictionary, key = OrderedDict(), None
     for line in text.splitlines():
