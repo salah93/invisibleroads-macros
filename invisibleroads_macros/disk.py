@@ -1,14 +1,13 @@
 import fnmatch
 import re
-import shutil
 import subprocess
 from contextlib import contextmanager
 from glob import glob
-from os import chdir, getcwd, makedirs, readlink, symlink, walk
+from os import chdir, getcwd, makedirs, readlink, remove, symlink, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
-from shutil import rmtree
+from shutil import copytree, rmtree
 from tempfile import mkdtemp
 
 from .exceptions import BadArchive, InvisibleRoadsError
@@ -23,23 +22,26 @@ def make_folder(folder):
 
 
 def clean_folder(folder):
-    remove_folder(folder)
+    remove_path(folder)
     return make_folder(folder)
 
 
 def replace_folder(target_folder, source_folder):
-    remove_folder(target_folder)
+    remove_path(target_folder)
     make_folder(dirname(target_folder))
-    shutil.copytree(source_folder, target_folder)
+    copytree(source_folder, target_folder)
     return target_folder
 
 
-def remove_folder(folder):
+def remove_path(path):
     try:
-        shutil.rmtree(folder)
+        rmtree(path)
     except OSError:
-        pass
-    return folder
+        try:
+            remove(path)
+        except OSError:
+            pass
+    return path
 
 
 def get_nickname(path):
@@ -147,17 +149,17 @@ def make_temporary_folder(suffix='', prefix='tmp', target_folder=None):
     rmtree(temporary_folder)
 
 
-def make_enumerated_folder_for(script_path):
+def make_enumerated_folder_for(script_path, first_index=0):
     package_name = get_nickname(script_path)
     if 'run' == package_name:
         package_folder = dirname(abspath(script_path))
         package_name = get_nickname(package_folder)
-    return make_enumerated_folder(join('/tmp', package_name))
+    return make_enumerated_folder(join('/tmp', package_name), first_index)
 
 
-def make_enumerated_folder(base_folder):
+def make_enumerated_folder(base_folder, first_index=0):
     suggest_folder = lambda x: join(base_folder, str(x))
-    target_index = 0
+    target_index = first_index
     target_folder = suggest_folder(target_index)
     while True:
         try:
