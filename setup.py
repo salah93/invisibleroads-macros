@@ -22,5 +22,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'msgpack-python',
+        'pytz',
         'pyzmq',
+        'tzlocal',
     ])

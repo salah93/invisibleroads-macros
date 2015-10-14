@@ -3,10 +3,11 @@ import re
 import subprocess
 from contextlib import contextmanager
 from glob import glob
-from os import chdir, getcwd, makedirs, readlink, remove, symlink, walk
+from os import chdir, getcwd, lchown, makedirs, readlink, remove, symlink, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
+from pwd import getpwnam
 from shutil import copytree, rmtree
 from tempfile import mkdtemp
 
@@ -169,3 +170,16 @@ def make_enumerated_folder(base_folder, first_index=0):
             target_index += 1
             target_folder = suggest_folder(target_index)
     return target_folder
+
+
+def change_owner_and_group_recursively(target_folder, target_username):
+    'Change uid and gid of folder and its contents, treating links as files'
+    pw_record = getpwnam(target_username)
+    target_uid = pw_record.pw_uid
+    target_gid = pw_record.pw_gid
+    for root_folder, folders, names in walk(target_folder):
+        for folder in folders:
+            lchown(join(root_folder, folder), target_uid, target_gid)
+        for name in names:
+            lchown(join(root_folder, name), target_uid, target_gid)
+    lchown(target_folder, target_uid, target_gid)
