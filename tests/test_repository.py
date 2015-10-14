@@ -2,7 +2,7 @@ from pytest import raises
 
 from invisibleroads_macros.exceptions import BadCommitHash, BadRepositoryURL
 from invisibleroads_macros.repository import (
-    parse_github_url, validate_commit_hash)
+    parse_github_url, validate_github_commit_hash)
 
 
 class TestParseGithubURL(object):
@@ -42,7 +42,7 @@ class TestValidateCommitHash(object):
             'cbc8cbe9cf203da62ea95dc8463d38d01e03b468',
         ]
         for commit_hash in commit_hashes:
-            validate_commit_hash(commit_hash)
+            validate_github_commit_hash(commit_hash)
 
     def test_invalid_commit_hashes(self):
         commit_hashes = [
@@ -54,4 +54,4 @@ class TestValidateCommitHash(object):
         ]
         for commit_hash in commit_hashes:
             with raises(BadCommitHash):
-                validate_commit_hash(commit_hash)
+                validate_github_commit_hash(commit_hash)

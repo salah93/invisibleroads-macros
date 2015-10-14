@@ -1,5 +1,6 @@
 import datetime
 import re
+import requests
 from os import getcwd
 from pytz import timezone
 from tzlocal import get_localzone
@@ -10,34 +11,34 @@ from .shell import run_command
 
 
 GITHUB_URL_PATTERN = re.compile(
-    r'github.com[/:]([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)')
+    r'github.com[/:]([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)(?:\.git)?$')
 
 
 def download_github_repository(target_folder, github_url):
     github_url = get_github_ssh_url(github_url)
     run_git(['git', 'clone', github_url, target_folder])
-    return get_repository_commit_hash(target_folder)
+    return get_github_repository_commit_hash(target_folder)
 
 
 def update_github_repository(folder):
     run_git('git fetch', folder)
-    return get_repository_commit_hash(folder)
+    return get_github_repository_commit_hash(folder)
 
 
-def get_repository_url(folder=None):
+def get_github_repository_url(folder=None):
     github_url = run_git('git config --get remote.origin.url', folder)
     return get_github_https_url(github_url)
 
 
-def get_repository_folder(folder=None):
+def get_github_repository_folder(folder=None):
     return run_git('git rev-parse --show-toplevel', folder)
 
 
-def get_repository_commit_hash(folder=None):
+def get_github_repository_commit_hash(folder=None):
     return run_git('git rev-parse HEAD', folder)
 
 
-def get_repository_commit_timestamp(
+def get_github_repository_commit_timestamp(
         folder=None, commit_hash=None, to_utc=False):
     update_github_repository(folder)
     timestamp_string = run_git([
@@ -85,9 +86,15 @@ def run_git(command_args, folder=None, exception_by_error=None):
     return output
 
 
-def validate_commit_hash(commit_hash):
+def validate_github_commit_hash(commit_hash):
     # Screen for non-alphanumeric characters
     match = re.search(r'[^a-zA-Z0-9]+', commit_hash)
     if match:
         raise BadCommitHash
     return commit_hash
+
+
+def get_github_user_properties(github_username):
+    response = requests.get(
+        'https://api.github.com/users/%s' % github_username)
+    return response.json()
