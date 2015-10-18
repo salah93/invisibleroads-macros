@@ -94,7 +94,16 @@ def validate_github_commit_hash(commit_hash):
     return commit_hash
 
 
-def get_github_user_properties(github_username):
-    response = requests.get(
-        'https://api.github.com/users/%s' % github_username)
-    return response.json()
+def get_github_user_properties(username):
+    response = requests.get('https://api.github.com/users/%s' % username)
+    response_json = response.json()
+    if 'message' in response_json:
+        return
+    return response_json
+
+
+def get_github_user_nickname(username):
+    user_properties = get_github_user_properties(username)
+    if not user_properties:
+        return
+    return user_properties['name']
