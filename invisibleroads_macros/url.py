@@ -20,8 +20,11 @@ def encode_number(non_negative_integer, alphabet=PRONOUNCEABLE_ALPHABET):
 def decode_number(string, alphabet=PRONOUNCEABLE_ALPHABET):
     base = len(alphabet)
     string_length = len(string)
-    non_negative_integer = 0
-    for character_number, character in enumerate(string, 1):
-        power = string_length - character_number
-        non_negative_integer += alphabet.index(character) * (base ** power)
-    return non_negative_integer
+    number = 0
+    try:
+        for character_number, character in enumerate(string, 1):
+            power = string_length - character_number
+            number += alphabet.index(character) * (base ** power)
+    except ValueError:
+        number = -1
+    return number

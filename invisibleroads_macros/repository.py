@@ -87,7 +87,7 @@ def run_git(command_args, folder=None, exception_by_error=None):
 
 
 def validate_github_commit_hash(commit_hash):
-    # Screen for non-alphanumeric characters
+    commit_hash = commit_hash.strip()
     match = re.search(r'[^a-zA-Z0-9]+', commit_hash)
     if match:
         raise BadCommitHash
