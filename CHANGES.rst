@@ -1,3 +1,8 @@
+0.5
+---
+- Add disk.make_enumerated_folder_for, disk.change_owner_and_group_recursively
+- Add repository.get_github_repository_commit_timestamp
+
 0.4
 ---
 - Add disk.make_enumerated_folder
@@ -6,7 +11,7 @@
 0.3
 ---
 - Add queue.Pusher, queue.Puller, queue.Publisher, queue.Subscriber
-- Add repository.get_github_repository, repository.get_github_ssh_url
+- Add repository.download_github_repository, repository.get_github_ssh_url
 
 0.2
 ---
