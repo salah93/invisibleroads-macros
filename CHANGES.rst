@@ -2,6 +2,8 @@
 ---
 - Add disk.make_enumerated_folder_for, disk.change_owner_and_group_recursively
 - Add repository.get_github_repository_commit_timestamp
+- Move queue.* to invisibleroads-sockets package
+- Move repository.* to invisibleroads-repositories package
 
 0.4
 ---

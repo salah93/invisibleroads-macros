@@ -32,6 +32,7 @@ setup(
     long_description=DESCRIPTION,
     classifiers=[
         'Programming Language :: Python',
+        'License :: OSI Approved :: MIT License',
     ],
     author='Roy Hyunjin Han',
     author_email='rhh@crosscompute.com',
@@ -40,12 +41,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=[
-        'msgpack-python',
-        'pytz',
-        'pyzmq',
-        'requests',
-        'tzlocal',
-    ],
+    install_requires=[],
     tests_require=['pytest'],
-    cmdclass = {'test': PyTest})
+    cmdclass={'test': PyTest})
