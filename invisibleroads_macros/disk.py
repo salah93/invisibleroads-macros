@@ -3,7 +3,7 @@ import re
 import subprocess
 from contextlib import contextmanager
 from glob import glob
-from os import chdir, getcwd, lchown, makedirs, readlink, remove, symlink, walk
+from os import chdir, getcwd, makedirs, remove, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
@@ -50,6 +50,7 @@ def get_nickname(path):
 
 
 def make_link(source_path, target_path):
+    from os import readlink, symlink
     source_path = normpath(source_path)
     if not exists(target_path):
         symlink(source_path, target_path)
@@ -174,6 +175,8 @@ def make_enumerated_folder(base_folder, first_index=0):
 
 def change_owner_and_group_recursively(target_folder, target_username):
     'Change uid and gid of folder and its contents, treating links as files'
+    from os import lchown
+    from pwd import getpwnam
     pw_record = getpwnam(target_username)
     target_uid = pw_record.pw_uid
     target_gid = pw_record.pw_gid
