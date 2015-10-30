@@ -23,4 +23,6 @@ def run_raw_command(command, exception_by_error=None):
                 raise exception
         else:
             raise InvisibleRoadsError(o)
+    except OSError as e:
+        raise InvisibleRoadsError(e.strerror)
     return output.strip()
