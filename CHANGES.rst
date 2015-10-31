@@ -1,3 +1,7 @@
+0.6
+---
+- Make disk.compress and disk.uncompress compatible with non-Linux
+
 0.5
 ---
 - Add disk.make_enumerated_folder_for, disk.change_owner_and_group_recursively

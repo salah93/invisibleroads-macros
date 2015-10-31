@@ -1,17 +1,15 @@
 import fnmatch
 import re
-import subprocess
+import tarfile
 from contextlib import contextmanager
-from glob import glob
 from os import chdir, getcwd, makedirs, remove, walk
 from os.path import (
     exists, isfile, join, splitext,
     abspath, basename, dirname, normpath, realpath, relpath)
-from pwd import getpwnam
+from pathlib import Path
 from shutil import copytree, rmtree
 from tempfile import mkdtemp
-
-from .exceptions import BadArchive, InvisibleRoadsError
+from zipfile import ZipFile, ZIP_DEFLATED
 
 
 def make_folder(folder):
@@ -87,46 +85,47 @@ def resolve_relative_path(relative_path, folder):
 
 def compress(source_folder, target_path=None):
     if not target_path:
-        target_path = normpath(source_folder) + '.tar.gz'
-    target_path = abspath(target_path)
+        target_path = source_folder + '.tar.gz'
     if target_path.endswith('.tar.gz'):
-        command_terms = ['tar', 'czhf']
+        compress_tar_gz(source_folder, target_path)
     else:
-        command_terms = ['zip', '-r', '-9']
-    with cd(source_folder):
-        source_paths = glob('*')
-        if not source_paths:
-            raise IOError('cannot compress empty folder "%s"' % source_folder)
-        subprocess.check_output(command_terms + [target_path] + source_paths)
+        compress_zip(source_folder, target_path)
+    return target_path
+
+
+def compress_tar_gz(source_folder, target_path=None):
+    if not target_path:
+        target_path = source_folder + '.tar.gz'
+    with tarfile.open(target_path, 'w:gz', dereference=True) as target_file:
+        for path in Path(source_folder).rglob('*'):
+            if path.is_dir():
+                continue
+            target_file.add(str(path), str(path.relative_to(source_folder)))
     return target_path
 
 
 def compress_zip(source_folder, target_path=None):
     if not target_path:
         target_path = source_folder + '.zip'
-    return compress(source_folder, target_path)
+    with ZipFile(
+        target_path, 'w', ZIP_DEFLATED, allowZip64=True,
+    ) as target_file:
+        for path in Path(source_folder).rglob('*'):
+            if path.is_dir():
+                continue
+            target_file.write(str(path), str(path.relative_to(source_folder)))
+    return target_path
 
 
 def uncompress(source_path, target_folder=None):
     if source_path.endswith('.tar.gz'):
-        command_terms = ['tar', 'xf', source_path, '-C']
-        target_extension = '.tar.gz'
+        source_file = tarfile.open(source_path, 'r:gz')
+        target_folder = re.sub(r'\.tar.gz$', '', source_path)
     else:
-        command_terms = ['unzip', source_path, '-d']
-        target_extension = '.zip'
-    if not target_folder:
-        target_folder = re.sub(
-            target_extension.replace('.', '\.') + '$', '', source_path)
-    make_folder(target_folder)
-    try:
-        subprocess.check_output(
-            command_terms + [target_folder], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        o = e.output
-        if 'does not look like a tar archive' in o:
-            m = 'could not unpack archive (source_path = %s)'
-            raise BadArchive(m % source_path)
-        raise InvisibleRoadsError(o)
+        source_file = ZipFile(source_path, 'r')
+        target_folder = re.sub(r'\.zip$', '', source_path)
+    source_file.extractall(target_folder)
+    source_file.close()
     return target_folder
 
 
