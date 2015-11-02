@@ -41,6 +41,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['pathlib'],
+    install_requires=[
+        'pathlib',
+        'six',
+    ],
     tests_require=['pytest'],
     cmdclass={'test': PyTest})

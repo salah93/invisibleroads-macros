@@ -1,6 +1,7 @@
 import re
 from collections import OrderedDict
 from os.path import expanduser
+from six import string_types
 
 
 def sort_dictionary(value_by_key, sorted_keys):
@@ -15,7 +16,7 @@ def sort_dictionary(value_by_key, sorted_keys):
 
 def stylize_dictionary(value_by_key, suffix_format_packs):
     d = {}
-    for key, value in value_by_key.iteritems():
+    for key, value in value_by_key.items():
         for suffix, format_value in suffix_format_packs:
             if key.endswith(suffix):
                 value = format_value(value)
@@ -29,8 +30,8 @@ def format_nested_dictionary(
     parts = []
     if censored:
         value_by_key = OrderedDict(
-            x for x in value_by_key.iteritems() if not x[0].startswith('_'))
-    for key, value in value_by_key.iteritems():
+            x for x in value_by_key.items() if not x[0].startswith('_'))
+    for key, value in value_by_key.items():
         left_hand_side = prefix + str(key)
         if isinstance(value, dict):
             parts.append(format_nested_dictionary(
@@ -41,7 +42,7 @@ def format_nested_dictionary(
                 parts.append(left_hand_side + ' = ' + format_value(value))
                 break
         else:
-            if isinstance(value, basestring) and '\n' in value:
+            if isinstance(value, string_types) and '\n' in value:
                 text = format_indented_block(value)
                 parts.append(left_hand_side + ' = ' + text)
             else:
@@ -82,8 +83,8 @@ def get_nested_dictionary(nested_lists):
 
 def get_nested_lists(nested_dictionary):
     xs = []
-    for k, v in nested_dictionary.iteritems():
-        if hasattr(v, 'iteritems'):
+    for k, v in nested_dictionary.items():
+        if hasattr(v, 'items'):
             v = get_nested_lists(v)
             k = k + '_'
         xs.append((k, v))
@@ -107,7 +108,7 @@ def parse_nested_dictionary(text, suffix_parse_packs=None):
             value = value.strip()
             raw_dictionary[key] = [value]
     d = OrderedDict()
-    for k, v in raw_dictionary.iteritems():
+    for k, v in raw_dictionary.items():
         v = '\n'.join(v).strip()
         for suffix, parse_value in suffix_parse_packs or []:
             if k.endswith(suffix):
