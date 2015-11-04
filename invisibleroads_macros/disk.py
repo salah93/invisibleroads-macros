@@ -4,8 +4,8 @@ import tarfile
 from contextlib import contextmanager
 from os import chdir, getcwd, makedirs, remove, walk
 from os.path import (
-    exists, isfile, join, splitext,
-    abspath, basename, dirname, normpath, realpath, relpath)
+    abspath, basename, dirname, exists, isfile, join, normpath, realpath,
+    relpath, sep, splitext)
 from pathlib import Path
 from shutil import copytree, rmtree
 from tempfile import mkdtemp
@@ -155,7 +155,7 @@ def make_enumerated_folder_for(script_path, first_index=0):
     if 'run' == package_name:
         package_folder = dirname(abspath(script_path))
         package_name = get_nickname(package_folder)
-    return make_enumerated_folder(join('/tmp', package_name), first_index)
+    return make_enumerated_folder(join(sep, 'tmp', package_name), first_index)
 
 
 def make_enumerated_folder(base_folder, first_index=0):
