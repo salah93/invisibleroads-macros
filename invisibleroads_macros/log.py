@@ -1,3 +1,4 @@
+import os
 import re
 from collections import OrderedDict
 from os.path import expanduser
@@ -51,7 +52,11 @@ def format_nested_dictionary(
 
 
 def format_path(x):
-    return re.sub(r'^' + expanduser('~'), '~', x)
+    if os.name == 'posix':
+        x = re.sub(r'^' + expanduser('~'), '~', x)
+    else:
+        x = x.replace('\\', '/')
+    return x
 
 
 def format_hanging_indent(x):
