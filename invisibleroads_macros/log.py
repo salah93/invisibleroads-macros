@@ -26,6 +26,15 @@ def stylize_dictionary(value_by_key, suffix_format_packs):
     return d
 
 
+def format_summary(value_by_key, suffix_format_packs=None, censored=False):
+    format_by_suffix = OrderedDict([
+        ('_folder', format_path),
+        ('_path', format_path),
+    ] + (suffix_format_packs or []))
+    return format_nested_dictionary(
+        OrderedDict(value_by_key), format_by_suffix.items(), censored=censored)
+
+
 def format_nested_dictionary(
         value_by_key, suffix_format_packs=None, prefix='', censored=False):
     parts = []
