@@ -1,8 +1,16 @@
+from __future__ import print_function
+
+
 import os
 import re
 from collections import OrderedDict
 from os.path import expanduser
 from six import string_types
+from sys import stderr
+
+
+def print_error(x, *args):
+    print(x % args, file=stderr)
 
 
 def sort_dictionary(value_by_key, sorted_keys):
