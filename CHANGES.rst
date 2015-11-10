@@ -1,6 +1,7 @@
 0.6
 ---
 - Make disk.compress and disk.uncompress compatible with non-Linux
+- Add log.format_summary, log.print_error
 
 0.5
 ---
