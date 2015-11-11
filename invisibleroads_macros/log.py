@@ -113,7 +113,8 @@ def get_nested_lists(nested_dictionary):
     return xs
 
 
-def parse_nested_dictionary_from(x, suffix_parse_packs=None):
+def parse_nested_dictionary_from(
+        x, suffix_parse_packs=None, max_depth=float('inf')):
     value_by_key = OrderedDict()
     for key, value in x.items():
         for suffix, parse_value in suffix_parse_packs or []:
@@ -121,14 +122,17 @@ def parse_nested_dictionary_from(x, suffix_parse_packs=None):
                 value = parse_value(value)
         key_parts = key.split('.')
         d = value_by_key
+        depth = 0
         while key_parts:
             key_part = key_parts.pop(0)
-            if len(key_parts):
+            if len(key_parts) and depth < max_depth:
                 if key_part not in d:
                     d[key_part] = OrderedDict()
                 d = d[key_part]
+                depth += 1
             else:
-                d[key_part] = value
+                d['.'.join([key_part] + key_parts)] = value
+                break
     return value_by_key
 
 
