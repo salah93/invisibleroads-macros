@@ -113,6 +113,25 @@ def get_nested_lists(nested_dictionary):
     return xs
 
 
+def parse_nested_dictionary_from(x, suffix_parse_packs=None):
+    value_by_key = OrderedDict()
+    for key, value in x.items():
+        for suffix, parse_value in suffix_parse_packs or []:
+            if key.endswith(suffix):
+                value = parse_value(value)
+        key_parts = key.split('.')
+        d = value_by_key
+        while key_parts:
+            key_part = key_parts.pop(0)
+            if len(key_parts):
+                if key_part not in d:
+                    d[key_part] = OrderedDict()
+                d = d[key_part]
+            else:
+                d[key_part] = value
+    return value_by_key
+
+
 def parse_nested_dictionary(text, suffix_parse_packs=None):
     raw_dictionary, key = OrderedDict(), None
     for line in text.splitlines():
