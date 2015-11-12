@@ -104,7 +104,7 @@ def compress_tar_gz(source_folder, target_path=None):
     return target_path
 
 
-def compress_zip(source_folder, target_path=None):
+def compress_zip(source_folder, target_path=None, excludes=None):
     if not target_path:
         target_path = source_folder + '.zip'
     with ZipFile(
@@ -113,7 +113,10 @@ def compress_zip(source_folder, target_path=None):
         for path in Path(source_folder).rglob('*'):
             if path.is_dir():
                 continue
-            target_file.write(str(path), str(path.relative_to(source_folder)))
+            if has_name_match(path, excludes):
+                continue
+            target_file.write(
+                str(path), str(path.relative_to(source_folder)))
     return target_path
 
 
@@ -131,6 +134,14 @@ def uncompress(source_path, target_folder=None):
 
 def are_same_path(path1, path2):
     return realpath(path1) == realpath(path2)
+
+
+def has_name_match(path, expressions):
+    name = basename(str(path))
+    for expression in expressions:
+        if fnmatch.fnmatch(name, expression):
+            return True
+    return False
 
 
 @contextmanager
