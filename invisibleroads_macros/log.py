@@ -113,13 +113,9 @@ def get_nested_lists(nested_dictionary):
     return xs
 
 
-def parse_nested_dictionary_from(
-        x, suffix_parse_packs=None, max_depth=float('inf')):
+def parse_nested_dictionary_from(raw_dictionary, max_depth=float('inf')):
     value_by_key = OrderedDict()
-    for key, value in x.items():
-        for suffix, parse_value in suffix_parse_packs or []:
-            if key.endswith(suffix):
-                value = parse_value(value)
+    for key, value in raw_dictionary.items():
         key_parts = key.split('.')
         d = value_by_key
         depth = 0
@@ -136,7 +132,7 @@ def parse_nested_dictionary_from(
     return value_by_key
 
 
-def parse_nested_dictionary(text, suffix_parse_packs=None):
+def parse_nested_dictionary(text):
     raw_dictionary, key = OrderedDict(), None
     for line in text.splitlines():
         if line.startswith('  '):
@@ -154,23 +150,14 @@ def parse_nested_dictionary(text, suffix_parse_packs=None):
             raw_dictionary[key] = [value]
     d = OrderedDict()
     for k, v in raw_dictionary.items():
-        v = '\n'.join(v).strip()
-        for suffix, parse_value in suffix_parse_packs or []:
-            if k.endswith(suffix):
-                v = parse_value(v)
-        _set_nested_value(d, k, v)
+        this_dictionary = d
+        for key in k.split('.'):
+            key = key.strip()
+            last_dictionary = this_dictionary
+            try:
+                this_dictionary = this_dictionary[key]
+            except KeyError:
+                this_dictionary[key] = {}
+                this_dictionary = this_dictionary[key]
+        last_dictionary[key] = '\n'.join(v).strip()
     return d
-
-
-def _set_nested_value(target_dictionary, key_string, value):
-    this_dictionary = target_dictionary
-    for key in key_string.split('.'):
-        key = key.strip()
-        last_dictionary = this_dictionary
-        try:
-            this_dictionary = this_dictionary[key]
-        except KeyError:
-            this_dictionary[key] = {}
-            this_dictionary = this_dictionary[key]
-    last_dictionary[key] = value
-    return target_dictionary
