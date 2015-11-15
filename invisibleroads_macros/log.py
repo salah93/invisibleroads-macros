@@ -115,7 +115,7 @@ def get_nested_lists(nested_dictionary):
 
 def parse_nested_dictionary_from(raw_dictionary, max_depth=float('inf')):
     value_by_key = OrderedDict()
-    for key, value in raw_dictionary.items():
+    for key, value in OrderedDict(raw_dictionary).items():
         key_parts = key.split('.')
         d = value_by_key
         depth = 0
