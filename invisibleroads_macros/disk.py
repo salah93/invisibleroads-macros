@@ -161,7 +161,7 @@ def make_temporary_folder(suffix='', prefix='tmp', target_folder=None):
     rmtree(temporary_folder)
 
 
-def make_enumerated_folder_for(script_path, first_index=0):
+def make_enumerated_folder_for(script_path, first_index=1):
     package_name = get_nickname(script_path)
     if 'run' == package_name:
         package_folder = dirname(abspath(script_path))
@@ -169,7 +169,7 @@ def make_enumerated_folder_for(script_path, first_index=0):
     return make_enumerated_folder(join(sep, 'tmp', package_name), first_index)
 
 
-def make_enumerated_folder(base_folder, first_index=0):
+def make_enumerated_folder(base_folder, first_index=1):
     suggest_folder = lambda x: join(base_folder, str(x))
     target_index = first_index
     target_folder = suggest_folder(target_index)
