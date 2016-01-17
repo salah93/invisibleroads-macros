@@ -1,1 +1,1 @@
-Consider making target_folder enumeration start at 1 by default
+Find and replace calls to duplicate_selected_column_names

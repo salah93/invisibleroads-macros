@@ -138,7 +138,7 @@ def are_same_path(path1, path2):
 
 def has_name_match(path, expressions):
     name = basename(str(path))
-    for expression in expressions:
+    for expression in expressions or []:
         if fnmatch.fnmatch(name, expression):
             return True
     return False
