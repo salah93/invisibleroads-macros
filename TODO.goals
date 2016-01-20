@@ -1,3 +1,1 @@
-Find and replace calls to duplicate_selected_column_names
-Add function to translate column name to existing column name format
-    normalize_column_name(column_name, existing_column_names)
+= Add function to translate column name to existing column name format: normalize_column_name(column_name, existing_column_names)

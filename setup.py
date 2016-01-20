@@ -1,25 +1,5 @@
 from os.path import abspath, dirname, join
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
-from sys import exit
-
-
-class PyTest(TestCommand):
-    user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = []
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.pytest_args)
-        exit(errno)
 
 
 FOLDER = dirname(abspath(__file__))
@@ -27,7 +7,7 @@ DESCRIPTION = '\n\n'.join(open(join(FOLDER, x)).read().strip() for x in [
     'README.rst', 'CHANGES.rst'])
 setup(
     name='invisibleroads-macros',
-    version='0.6.3',
+    version='0.6.4',
     description='Shortcut functions',
     long_description=DESCRIPTION,
     classifiers=[
@@ -41,9 +21,13 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
+    setup_requires=[
+        'pytest-runner',
+    ],
     install_requires=[
         'pathlib',
         'six',
     ],
-    tests_require=['pytest'],
-    cmdclass={'test': PyTest})
+    tests_require=[
+        'pytest',
+    ])
