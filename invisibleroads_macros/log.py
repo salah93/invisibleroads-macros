@@ -132,7 +132,7 @@ def parse_nested_dictionary_from(raw_dictionary, max_depth=float('inf')):
     return value_by_key
 
 
-def parse_nested_dictionary(text):
+def parse_nested_dictionary(text, is_key=lambda x: True):
     raw_dictionary, key = OrderedDict(), None
     for line in text.splitlines():
         if line.startswith('  '):
@@ -143,6 +143,8 @@ def parse_nested_dictionary(text):
         try:
             key, value = line.split('=', 1)
         except ValueError:
+            key = None
+        if not is_key(key):
             key = None
         else:
             key = key.strip()
