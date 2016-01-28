@@ -2,6 +2,7 @@
 ---
 - Add log.format_summary, log.print_error
 - Add normalize_column_name
+- Filter keys in parse_nested_dictionary with is_key
 - Make disk.compress and disk.uncompress compatible with non-Linux
 
 0.5
