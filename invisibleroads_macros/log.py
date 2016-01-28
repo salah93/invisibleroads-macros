@@ -142,14 +142,15 @@ def parse_nested_dictionary(text, is_key=lambda x: True):
             continue
         try:
             key, value = line.split('=', 1)
+            if not is_key(key):
+                key = None
         except ValueError:
             key = None
-        if not is_key(key):
-            key = None
-        else:
-            key = key.strip()
-            value = value.strip()
-            raw_dictionary[key] = [value]
+        if not key:
+            continue
+        key = key.strip()
+        value = value.strip()
+        raw_dictionary[key] = [value]
     d = OrderedDict()
     for k, v in raw_dictionary.items():
         this_dictionary = d
