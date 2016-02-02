@@ -164,7 +164,7 @@ def make_temporary_folder(suffix='', prefix='tmp', target_folder=None):
 def make_enumerated_folder_for(script_path, first_index=1):
     package_name = get_nickname(script_path)
     if 'run' == package_name:
-        package_folder = dirname(abspath(script_path))
+        package_folder = get_package_folder(script_path)
         package_name = get_nickname(package_folder)
     return make_enumerated_folder(join(sep, 'tmp', package_name), first_index)
 
@@ -181,6 +181,10 @@ def make_enumerated_folder(base_folder, first_index=1):
             target_index += 1
             target_folder = suggest_folder(target_index)
     return target_folder
+
+
+def get_package_folder(script_path):
+    return dirname(abspath(script_path))
 
 
 def change_owner_and_group_recursively(target_folder, target_username):
