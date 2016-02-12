@@ -60,11 +60,11 @@ def format_nested_dictionary(
                 parts.append(left_hand_side + ' = ' + format_value(value))
                 break
         else:
-            if isinstance(value, string_types) and '\n' in value:
-                text = format_indented_block(value)
-                parts.append(left_hand_side + ' = ' + text)
-            else:
-                parts.append(left_hand_side + ' = ' + str(value))
+            if not isinstance(value, string_types):
+                value = str(value)
+            if '\n' in value:
+                value = format_indented_block(value)
+            parts.append(left_hand_side + ' = ' + value)
     return '\n'.join(parts)
 
 
