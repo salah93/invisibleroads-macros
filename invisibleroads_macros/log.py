@@ -141,7 +141,7 @@ def parse_nested_dictionary(text, is_key=lambda x: True):
                 raw_dictionary[key].append(value)
             continue
         try:
-            key, value = line.split('=', 1)
+            key, value = line.split(' = ', 1)
             if not is_key(key):
                 key = None
         except ValueError:
