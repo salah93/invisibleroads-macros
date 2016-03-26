@@ -10,11 +10,20 @@ from sys import stderr
 
 
 def print_error(x, *args):
+    """
+        prints to stderr
+    """
     print(x % args, file=stderr)
 
 
-def sort_dictionary(value_by_key, sorted_keys):
+def sort_dictionary(value_by_key, sorted_keys=None):
+    """
+        sorts a dictionary, maintain order using orderddict
+    """
     d = OrderedDict()
+    if not sorted_keys:
+        d.update({k: value_by_key[k] for k in sorted(value_by_key.keys())})
+        return d
     for key in sorted_keys:
         try:
             d[key] = value_by_key[key]
