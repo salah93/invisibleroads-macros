@@ -1,2 +1,4 @@
-Add function to translate column name to existing column name format: normalize_column_name(column_name, existing_column_names)
-Use pathlib
+Release 0.6.8
+    Translate column name to existing column name format
+        Implement normalize_column_name(column_name, existing_column_names)
+    Use pathlib
