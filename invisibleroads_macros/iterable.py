@@ -45,6 +45,11 @@ class OrderedDefaultDict(OrderedDict):
             self.default_factory, OrderedDict.__repr__(self))
 
 
+def flatten(list_of_lists):
+    # http://stackoverflow.com/a/952952/192092
+    return [item for sublist in list_of_lists for item in sublist]
+
+
 def merge_dictionaries(*ds):
     # http://stackoverflow.com/a/26853961
     x = {}
