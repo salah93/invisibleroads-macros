@@ -57,3 +57,11 @@ def merge_dictionaries(*ds):
     for d in ds:
         x.update(d)
     return x
+
+
+def get_lists_from_tuples(xs):
+    'Convert tuples to lists'
+    # http://stackoverflow.com/a/1014669
+    if isinstance(xs, (list, tuple)):
+        return list(map(get_lists_from_tuples, xs))
+    return xs
