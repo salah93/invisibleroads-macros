@@ -53,7 +53,7 @@ def flatten(list_of_lists):
 def merge_dictionaries(*ds):
     'Overwrite duplicate keys with subsequent keys to produce a dictionary'
     # http://stackoverflow.com/a/26853961
-    x = {}
+    x = OrderedDict()
     for d in ds:
         x.update(d)
     return x
