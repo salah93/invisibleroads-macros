@@ -1,6 +1,6 @@
 0.6
 ---
-- Add iterable.flatten, iterable.merge_dictionaries
+- Add iterable.OrderedSet, iterable.flatten, iterable.merge_dictionaries
 - Add log.format_summary, log.print_error
 - Add table.normalize_column_name
 - Filter keys in parse_nested_dictionary with is_key
