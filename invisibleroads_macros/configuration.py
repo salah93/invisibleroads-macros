@@ -1,5 +1,10 @@
 import re
 from collections import defaultdict
+from six.moves.configparser import RawConfigParser
+
+
+class RawCaseSensitiveConfigParser(RawConfigParser):
+    optionxform = str
 
 
 def get_interpretation_by_name(settings, prefix, interpret_setting):

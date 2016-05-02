@@ -48,7 +48,7 @@ def get_nickname(path):
 
 
 def make_link(source_path, target_path):
-    from os import readlink, symlink
+    from os import readlink, symlink  # Undefined in Windows
     source_path = normpath(source_path)
     if not exists(target_path):
         symlink(source_path, target_path)
@@ -170,7 +170,10 @@ def make_enumerated_folder_for(script_path, first_index=1):
 
 
 def make_enumerated_folder(base_folder, first_index=1):
-    suggest_folder = lambda x: join(base_folder, str(x))
+
+    def suggest_folder(index):
+        return join(base_folder, str(index))
+
     target_index = first_index
     target_folder = suggest_folder(target_index)
     while True:
@@ -189,8 +192,8 @@ def get_package_folder(script_path):
 
 def change_owner_and_group_recursively(target_folder, target_username):
     'Change uid and gid of folder and its contents, treating links as files'
-    from os import lchown
-    from pwd import getpwnam
+    from os import lchown     # Undefined in Windows
+    from pwd import getpwnam  # Undefined in Windows
     pw_record = getpwnam(target_username)
     target_uid = pw_record.pw_uid
     target_gid = pw_record.pw_gid
@@ -200,3 +203,17 @@ def change_owner_and_group_recursively(target_folder, target_username):
         for name in names:
             lchown(join(root_folder, name), target_uid, target_gid)
     lchown(target_folder, target_uid, target_gid)
+
+
+def get_file_extension(file_name, max_length=16):
+    # Extract extension
+    try:
+        file_extension = file_name.split('.', 1)[1]
+    except IndexError:
+        return ''
+    # Sanitize characters
+    file_extension = ''.join(x for x in file_extension if x.isalnum() or x in [
+        ',', '-', '_',
+    ]).rstrip()
+    # Limit length
+    return '.' + file_extension[-max_length:]
