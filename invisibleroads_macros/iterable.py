@@ -106,18 +106,35 @@ class OrderedSet(MutableSet):
         return set(self) == set(other)
 
 
-def flatten(list_of_lists):
+def flatten_lists(list_of_lists):
     # http://stackoverflow.com/a/952952/192092
     return [item for sublist in list_of_lists for item in sublist]
 
 
-def merge_dictionaries(*ds):
-    'Overwrite duplicate keys with subsequent keys to produce a dictionary'
-    # http://stackoverflow.com/a/26853961
-    x = OrderedDict()
-    for d in ds:
-        x.update(d)
-    return x
+def flatten_dictionaries(dictionary_of_dictionaries):
+    'Combined nested dictionary into a simple dictionary'
+    d = OrderedDict()
+    for outer_k, outer_v in dictionary_of_dictionaries.items():
+        if not hasattr(outer_v, 'items'):
+            d[outer_k] = outer_v
+            continue
+        for inner_k, inner_v in flatten_dictionaries(outer_v).items():
+            d['%s.%s' % (outer_k, inner_k)] = inner_v
+    return d
+
+
+def merge_dictionaries(*dictionaries):
+    'Combine multiple nested dictionaries and overwrite duplicate keys'
+    d = OrderedDict()
+    for outer_d in dictionaries:
+        for outer_k, outer_v in outer_d.items():
+            d1 = d.get(outer_k, {})
+            d2 = outer_v
+            if hasattr(d1, 'items') and hasattr(d2, 'items'):
+                d[outer_k] = merge_dictionaries(d1, d2)
+            else:
+                d[outer_k] = d2
+    return d
 
 
 def get_lists_from_tuples(xs):
