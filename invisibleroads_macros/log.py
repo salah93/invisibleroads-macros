@@ -71,8 +71,6 @@ def format_nested_dictionary(
 def format_path(x):
     if os.name == 'posix':
         x = re.sub(r'^' + expanduser('~'), '~', x)
-    else:
-        x = x.replace('\\', '/')
     return x
 
 
