@@ -1,4 +1,5 @@
 import re
+import sys
 from collections import defaultdict
 from six.moves.configparser import RawConfigParser
 
@@ -18,3 +19,10 @@ def get_interpretation_by_name(settings, prefix, interpret_setting):
         interpretation = interpretation_by_name[name]
         interpretation.update(interpret_setting(attribute, value))
     return interpretation_by_name
+
+
+def unicode_(x):
+    # http://stackoverflow.com/a/23085282/192092
+    if not hasattr(x, 'decode'):
+        return x
+    return x.decode(sys.getfilesystemencoding())
