@@ -1,4 +1,5 @@
 import re
+import shlex
 import sys
 from collections import defaultdict
 from six.moves.configparser import RawConfigParser
@@ -26,3 +27,10 @@ def unicode_(x):
     if not hasattr(x, 'decode'):
         return x
     return x.decode(sys.getfilesystemencoding())
+
+
+def split_(x):
+    try:
+        return shlex.split(x)
+    except UnicodeEncodeError:
+        return shlex.split(x.encode('utf-8'))
