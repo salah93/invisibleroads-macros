@@ -22,14 +22,14 @@ def get_interpretation_by_name(settings, prefix, interpret_setting):
     return interpretation_by_name
 
 
-def unicode_(x):
+def unicode_safely(x):
     # http://stackoverflow.com/a/23085282/192092
     if not hasattr(x, 'decode'):
         return x
     return x.decode(sys.getfilesystemencoding())
 
 
-def split_(x):
+def split_arguments(x):
     try:
         return shlex.split(x)
     except UnicodeEncodeError:
