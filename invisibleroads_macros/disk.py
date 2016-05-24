@@ -8,7 +8,7 @@ from os.path import (
     relpath, sep, splitext)
 from pathlib import Path
 from shutil import copytree, rmtree
-from tempfile import mkdtemp
+from tempfile import mkdtemp, mkstemp
 from zipfile import ZipFile, ZIP_DEFLATED
 
 
@@ -152,6 +152,13 @@ def cd(target_folder):
         yield
     finally:
         chdir(source_folder)
+
+
+@contextmanager
+def make_temporary_path(suffix='', prefix='tmp', target_folder=None):
+    temporary_path = mkstemp(suffix, prefix, target_folder)
+    yield temporary_path
+    rmtree(temporary_path)
 
 
 @contextmanager
