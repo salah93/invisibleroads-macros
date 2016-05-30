@@ -12,9 +12,10 @@ def get_percent_change(new_value, old_value):
     return 100 * change_ratio
 
 
-def define_normalize(xs, (y_min, y_max)):
-    x_min = min(xs)
-    x_max = max(xs)
+def define_normalize(xs, ys):
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(ys), max(ys)
+
     x_width = (x_max - x_min) or 1
     y_width = (y_max - y_min) or 1
 
