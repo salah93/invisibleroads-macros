@@ -9,3 +9,5 @@ dist
 # Vim
 *.sw[op]
 *~
+*.ipynb
+__pycache__

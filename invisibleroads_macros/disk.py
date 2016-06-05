@@ -4,7 +4,9 @@ import tarfile
 from contextlib import contextmanager
 from os import chdir, getcwd, makedirs, remove, walk
 from os.path import (
-    abspath, basename, dirname, exists, isfile, join, normpath, realpath,
+    abspath, basename, dirname,
+    exists, isdir, isfile,
+    join, normpath, realpath,
     relpath, sep, splitext)
 from pathlib import Path
 from shutil import copytree, rmtree
@@ -13,6 +15,9 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 
 def make_folder(folder):
+    """
+        makes a folder, doesn't raise an exception if folder already exists
+    """
     try:
         makedirs(folder)
     except OSError:
@@ -21,18 +26,26 @@ def make_folder(folder):
 
 
 def clean_folder(folder):
+    """
+        removes folder contents
+    """
     remove_path(folder)
     return make_folder(folder)
 
 
 def replace_folder(target_folder, source_folder):
+    """
+        replaces a folder with source_folder
+    """
+    if isfile(target_folder):
+        raise OSError('must pass directory')
     remove_path(target_folder)
-    make_folder(dirname(target_folder))
     copytree(source_folder, target_folder)
     return target_folder
 
 
 def remove_path(path):
+    """ removes a file or directory from disk """
     try:
         rmtree(path)
     except OSError:
@@ -44,11 +57,18 @@ def remove_path(path):
 
 
 def get_nickname(path):
+    """
+        returns the name of file,
+        example: ./file.txt -> file
+    """
     return splitext(basename(path))[0]
 
 
 def make_link(source_path, target_path):
     from os import readlink, symlink  # Undefined in Windows
+    """
+        creates a symbolic link to source_path
+    """
     source_path = normpath(source_path)
     if not exists(target_path):
         symlink(source_path, target_path)
@@ -56,20 +76,29 @@ def make_link(source_path, target_path):
     try:
         if normpath(readlink(target_path)) != source_path:
             raise IOError('could not make link; target_path is another link')
+        else:
+            return target_path
     except OSError:
         path_type = 'file' if isfile(target_path) else 'folder'
-        raise IOError('could not make link; target_path is a %s' % path_type)
-    return target_path
+        raise IOError(
+            'could not make link; target_path is a {0}'.format(path_type))
 
 
 def find_path(name, folder):
-    for root_folder, folder_names, file_names in walk(folder):
-        if name in file_names:
-            return join(root_folder, name)
-    raise IOError('cannot find "%s" in "%s"' % (name, folder))
+    """
+        finds the file in folder/sub-folders
+    """
+    for root, folders, files in walk(folder):
+        if name in files:
+            return join(root, name)
+    raise IOError('cannot find {0} in {1}'.format(name, folder))
 
 
 def find_paths(name_expression, folder):
+    """
+        finds files matching the expression in folder,
+        and subfolders
+    """
     return [
         join(root_folder, file_name)
         for root_folder, folder_names, file_names in walk(folder)
@@ -84,6 +113,11 @@ def resolve_relative_path(relative_path, folder):
 
 
 def compress(source_folder, target_path=None):
+    """
+        compresses a folder to a target_path
+        if folder ends with '.tar.gz' a tarball is produced
+        otherwise it is compressed into a zip file
+    """
     if not target_path:
         target_path = source_folder + '.tar.gz'
     if target_path.endswith('.tar.gz'):
@@ -94,13 +128,16 @@ def compress(source_folder, target_path=None):
 
 
 def compress_tar_gz(source_folder, target_path=None):
+    """
+        compresses into a tarball
+    """
     if not target_path:
         target_path = source_folder + '.tar.gz'
     with tarfile.open(target_path, 'w:gz', dereference=True) as target_file:
-        for path in Path(source_folder).rglob('*'):
-            if path.is_dir():
+        for path in find_paths('*', source_folder):
+            if isdir(path):
                 continue
-            target_file.add(str(path), str(path.relative_to(source_folder)))
+            target_file.add(str(path), str(relpath(path, source_folder)))
     return target_path
 
 
@@ -176,21 +213,14 @@ def make_enumerated_folder_for(script_path, first_index=1):
     return make_enumerated_folder(join(sep, 'tmp', package_name), first_index)
 
 
-def make_enumerated_folder(base_folder, first_index=1):
-
-    def suggest_folder(index):
-        return join(base_folder, str(index))
-
-    target_index = first_index
-    target_folder = suggest_folder(target_index)
-    while True:
-        try:
-            makedirs(target_folder)
-            break
-        except OSError:
-            target_index += 1
-            target_folder = suggest_folder(target_index)
-    return target_folder
+def make_enumerated_folder(base_folder, index=1):
+    """make an indexed subfolder to base_folder"""
+    target_folder = join(base_folder, str(index))
+    if exists(target_folder):
+        return make_enumerated_folder(base_folder, index + 1)
+    else:
+        makedirs(target_folder)
+        return target_folder
 
 
 def get_package_folder(script_path):
