@@ -33,7 +33,6 @@ def clean_folder(folder):
     return make_folder(folder)
 
 
-# TODO: check if target_folder is dir?
 def replace_folder(target_folder, source_folder):
     """
         replaces a folder with source_folder
@@ -69,43 +68,41 @@ def make_link(source_path, target_path):
     """
         creates a symbolic link to source_path
     """
-    from os import symlink
+    from os import readlink, symlink
     source_path = normpath(source_path)
     if not exists(target_path):
         symlink(source_path, target_path)
         return target_path
-    else:
-        raise OSError('{0}: file exists'.format(target_path))
-    return target_path
+    try:
+        if normpath(readlink(target_path)) != source_path:
+            raise IOError('could not make link; target_path is another link')
+        else:
+            return target_path
+    except OSError:
+        path_type = 'file' if isfile(target_path) else 'folder'
+        raise IOError(
+            'could not make link; target_path is a {0}'.format(path_type))
 
 
-def find_path(name, folder, recursive=True):
+def find_path(name, folder):
     """
         finds the file in folder/sub-folders
     """
-    if recursive:
-        for root_folder, folder_names, file_names in walk(folder):
-            if name in file_names:
-                return join(root_folder, name)
-    else:
-        if name in listdir(folder):
-            return join(folder, name)
-    raise IOError('cannot find "%s" in "%s"' % (name, folder))
+    for root, folders, files in walk(folder):
+        if name in files:
+            return join(root, name)
+    raise IOError('cannot find {0} in {1}'.format(name, folder))
 
 
-def find_paths(name_expression, folder, recursive=True):
+def find_paths(name_expression, folder):
     """
         finds files matching the expression in folder,
-        and subfolders if recursive is specified
+        and subfolders
     """
-    if recursive:
-        return [
-            join(root_folder, file_name)
-            for root_folder, folder_names, file_names in walk(folder)
-            for file_name in fnmatch.filter(file_names, name_expression)]
-    return [join(folder, filename) for filename in listdir(folder) if isfile(
-            join(folder, filename)) and fnmatch.fnmatch(
-                filename, name_expression)]
+    return [
+        join(root_folder, file_name)
+        for root_folder, folder_names, file_names in walk(folder)
+        for file_name in fnmatch.filter(file_names, name_expression)]
 
 
 def resolve_relative_path(relative_path, folder):
@@ -138,7 +135,6 @@ def compress_tar_gz(source_folder, target_path=None):
         target_path = source_folder + '.tar.gz'
     with tarfile.open(target_path, 'w:gz', dereference=True) as target_file:
         for path in find_paths('*', source_folder):
-            # TODO: add directories
             if isdir(path):
                 continue
             target_file.add(str(path), str(relpath(path, source_folder)))
@@ -210,18 +206,14 @@ def make_enumerated_folder_for(script_path, first_index=1):
     return make_enumerated_folder(join(sep, 'tmp', package_name), first_index)
 
 
-def make_enumerated_folder(base_folder, first_index=1):
-    suggest_folder = lambda x: join(base_folder, str(x))
-    target_index = first_index
-    target_folder = suggest_folder(target_index)
-    while True:
-        try:
-            makedirs(target_folder)
-            break
-        except OSError:
-            target_index += 1
-            target_folder = suggest_folder(target_index)
-    return target_folder
+def make_enumerated_folder(base_folder, index=1):
+    """make an indexed subfolder to base_folder"""
+    target_folder = join(base_folder, str(index))
+    if exists(target_folder):
+        return make_enumerated_folder(base_folder, index + 1)
+    else:
+        makedirs(target_folder)
+        return target_folder
 
 
 def get_package_folder(script_path):
